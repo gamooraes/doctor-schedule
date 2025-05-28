@@ -5,11 +5,13 @@ import { AppSidebar } from "./components/app-sidebar";
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
+      <div className="flex h-screen">
+        <AppSidebar />
+        <main className="flex-1">
+          <SidebarTrigger />
+          {children}
+        </main>
+      </div>
     </SidebarProvider>
   );
 };
