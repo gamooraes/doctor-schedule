@@ -27,15 +27,16 @@ export const auth = betterAuth({
         },
       });
       // TODO: Conforme evoluir o projeto, irei adicionar mais de uma clinica para o usuário
-      const clinic = clinics[0];
-
+      const clinic = clinics?.[0];
       return {
         user: {
           ...user,
-          clinic: {
-            clinicId: clinic.clinicId,
-            name: clinic.clinic.name,
-          },
+          clinic: clinic?.clinicId
+            ? {
+                clinicId: clinic?.clinicId,
+                name: clinic?.clinic?.name,
+              }
+            : undefined,
         },
         session,
       };
