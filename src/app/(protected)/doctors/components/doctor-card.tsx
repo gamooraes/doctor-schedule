@@ -3,6 +3,7 @@
 import { Avatar, AvatarFallback } from "@radix-ui/react-avatar";
 import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
 import { CalendarIcon, ClockIcon, DollarSignIcon } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ interface DoctorCardProps {
 }
 
 const DoctorCard = ({ doctor }: DoctorCardProps) => {
+  const [isUpsertDoctorDialogOpen, setIsUpsertDoctorDialogOpen] =
+    useState(false);
   const doctorInitials = doctor.name
     .split(" ")
     .map((name) => name.charAt(0))
@@ -31,7 +34,12 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
 
   const availability = getAvailability(doctor);
 
-  console.log(doctor.appointmentPriceInCents);
+  console.log("Doctor object:", doctor);
+  console.log("Availability:", availability);
+  console.log("Doctor times:", {
+    fromTime: doctor.availableFromTime,
+    toTime: doctor.availableToTime,
+  });
 
   return (
     <Card>
@@ -46,34 +54,41 @@ const DoctorCard = ({ doctor }: DoctorCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <Separator>
-        <CardContent className="flex flex-col gap-2">
-          <Badge variant="outline">
-            <CalendarIcon className="mr-1" />
-            {availability.from.format("dddd")} a{" "}
-            {availability.to.format("dddd")}
-          </Badge>
-          <Badge variant="outline">
-            <ClockIcon className="mr-1" />
-            {availability.from.format("HH:mm")} as{" "}
-            {availability.to.format("HH:mm")}
-          </Badge>
-          <Badge variant="outline">
-            <DollarSignIcon className="mr-1" />
-            {formatCurrency(doctor.appointmentPriceInCents)}
-          </Badge>
-        </CardContent>
-        <Separator>
-          <CardFooter>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="w-full">Ver detalhes</Button>
-              </DialogTrigger>
-              <UpsertDoctorForm />
-            </Dialog>
-          </CardFooter>
-        </Separator>
-      </Separator>
+      <Separator />
+      <CardContent className="flex flex-col gap-2">
+        <Badge variant="outline">
+          <CalendarIcon className="mr-1" />
+          {availability.from.format("dddd")} a {availability.to.format("dddd")}
+        </Badge>
+        <Badge variant="outline">
+          <ClockIcon className="mr-1" />
+          {availability.from.format("HH:mm")} as{" "}
+          {availability.to.format("HH:mm")}
+        </Badge>
+        <Badge variant="outline">
+          <DollarSignIcon className="mr-1" />
+          {formatCurrency(doctor.appointmentPriceInCents)}
+        </Badge>
+      </CardContent>
+      <Separator />
+      <CardFooter>
+        <Dialog
+          open={isUpsertDoctorDialogOpen}
+          onOpenChange={setIsUpsertDoctorDialogOpen}
+        >
+          <DialogTrigger asChild>
+            <Button className="w-full">Ver detalhes</Button>
+          </DialogTrigger>
+          <UpsertDoctorForm
+            doctor={{
+              ...doctor,
+              availableFromTime: availability.from.format("HH:mm:ss"),
+              availableToTime: availability.to.format("HH:mm:ss"),
+            }}
+            onSuccess={() => setIsUpsertDoctorDialogOpen(false)}
+          />
+        </Dialog>
+      </CardFooter>
     </Card>
   );
 };
