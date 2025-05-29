@@ -1,8 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { NumericFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
+import { upsertDoctor } from "@/actions/upsert-doctor";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -62,7 +65,11 @@ const formSchema = z
     },
   );
 
-const UpsertDoctorForm = () => {
+interface UpsertDoctorFormProps {
+  onSuccess?: () => void;
+}
+
+const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -76,8 +83,23 @@ const UpsertDoctorForm = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const upsertDoctorAction = useAction(upsertDoctor, {
+    onSuccess: () => {
+      toast.success("Médico adicionado com sucesso");
+      onSuccess?.();
+    },
+    onError: () => {
+      toast.error("Erro ao adicionar médico");
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    upsertDoctorAction.execute({
+      ...values,
+      appointmentPriceInCents: values.appointmentPrice * 100,
+      availableFromWeekDay: parseInt(values.availableFromWeekDay),
+      availableToWeekDay: parseInt(values.availableToWeekDay),
+    });
   };
 
   return (
@@ -117,11 +139,17 @@ const UpsertDoctorForm = () => {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {medicalSpecialties.map((specialty) => (
-                      <SelectItem key={specialty.value} value={specialty.value}>
-                        {specialty.label}
-                      </SelectItem>
-                    ))}
+                    <SelectGroup>
+                      <SelectLabel>Especialidades</SelectLabel>
+                      {medicalSpecialties.map((specialty) => (
+                        <SelectItem
+                          key={specialty.value}
+                          value={specialty.value}
+                        >
+                          {specialty.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -352,7 +380,9 @@ const UpsertDoctorForm = () => {
           />
 
           <DialogFooter>
-            <Button type="submit">Adicionar</Button>
+            <Button type="submit" disabled={upsertDoctorAction.isPending}>
+              {upsertDoctorAction.isExecuting ? "Adicionando..." : "Adicionar"}
+            </Button>
           </DialogFooter>
         </form>
       </Form>
