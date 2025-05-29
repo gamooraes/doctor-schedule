@@ -99,6 +99,8 @@ const UpsertDoctorForm = ({ onSuccess }: UpsertDoctorFormProps) => {
       appointmentPriceInCents: values.appointmentPrice * 100,
       availableFromWeekDay: parseInt(values.availableFromWeekDay),
       availableToWeekDay: parseInt(values.availableToWeekDay),
+      availableFromTime: values.availableFromTime || "00:00:00",
+      availableToTime: values.availableToTime || "00:00:00",
     });
   };
 
