@@ -421,42 +421,45 @@ const UpsertDoctorForm = ({ doctor, onSuccess }: UpsertDoctorFormProps) => {
             )}
           />
 
-          <DialogFooter>
-            <Button type="submit" disabled={upsertDoctorAction.isPending}>
-              {upsertDoctorAction.isExecuting
-                ? "Salvando..."
-                : doctor
-                  ? "Salvar"
-                  : "Adicionar"}
-            </Button>
+          <DialogFooter className="flex w-full justify-between">
+            <div className="flex gap-2">
+              {doctor && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline">
+                      <TrashIcon className="mr-2 h-4 w-4" />
+                      Deletar
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Tem certeza que deseja deletar esse médico?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Esta ação não pode ser revertida. Isso irá deletar o
+                        médico permanentemente e remover todas suas consultas
+                        agendadas.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeleteDoctorClick}>
+                        Deletar
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+              <Button type="submit" disabled={upsertDoctorAction.isPending}>
+                {upsertDoctorAction.isExecuting
+                  ? "Salvando..."
+                  : doctor
+                    ? "Salvar"
+                    : "Adicionar"}
+              </Button>
+            </div>
           </DialogFooter>
-          {doctor && (
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="outline">
-                  <TrashIcon />
-                  Deletar
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Tem certeza que deseja deletar esse médico?
-                  </AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Esta ação não pode ser revertida. Isso irá deletar o médico
-                    permanentemente e remover todas suas consultas agendadas.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteDoctorClick}>
-                    Deletar
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          )}
         </form>
       </Form>
     </DialogContent>
